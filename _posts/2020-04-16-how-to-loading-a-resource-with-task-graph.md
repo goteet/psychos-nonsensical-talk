@@ -1,7 +1,6 @@
 ---
 layout: default
 title: 使用 Task Graph 简化资源异步加载的复杂度
-typora-root-url: ./
 ---
 
 # 使用 Task Graph 简化资源异步加载的复杂度
