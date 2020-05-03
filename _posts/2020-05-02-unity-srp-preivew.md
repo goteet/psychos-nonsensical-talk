@@ -9,7 +9,7 @@ title: Unity SRP 概念介绍
 
 2020-05-02 快速翻一遍
 
-这是一个很早起的 Slider 的翻译。
+这是一个很早期介绍概念的 Slider 的翻译。
 
 本来是希望找到和 Frame Graph 对应的概念，通过使用方式或介绍推导一下具体设计方法的。似乎概念还不太一样，应该去看看文中提到的 Tobias Pesson 在 blog 里写的内容。
 
@@ -71,11 +71,77 @@ title: Unity SRP 概念介绍
 - 引擎c++代码：裁剪；排序；Batching；渲染物体集合；渲染平台抽象。
 - c# or shader：摄像机设置；光照、阴影设置；每一帧的 Render Passes 设置和逻辑；compute/shader 代码
 
+#### 前人的经验
+
 除了我们，别人也有这么做过的：
 
 - “[Benefits of a data-driven renderer](https://www.slideshare.net/tobias_persson/bstech-gdc2011)”, Tobias Persson, GDC 2011
 - “[Destiny’s Multi-Threaded Rendering Architecture](http://advances.realtimerendering.com/destiny/gdc_2015/)”, Natalya Tatarchuk, GDC 2015
 - “[Framegraph: Extensible Rendering Architecture in Frostbite](https://www.ea.com/frostbite/news/framegraph-extensible-rendering-architecture-in-frostbite)”, Yuriy O’Donell, GDC
+
+
+
+这三个论文，第一个不太好找：所以我直接把 PDF 在这里翻译一下渲染实现的部分：
+
+用 Json 来描述整个渲染管线（可以热加载），如下图所示：
+
+![render_config_overview]({{ site.baseurl }}/images/2020-05-02-unity-srp-preivew/render_config_overview.png)
+
+图：完整的渲染管线声明结构。
+
+**全局资源**：最一开始的时候，所有的 Render Target （资源，图上都是rt）都要明确声明好，通过名字设置依赖关系，启动的时候就会被进行分配。
+
+**Layer配置**：定义所有可见 Batch 的渲染顺序。每一层的顺序是在声明的时候就指定好的，通过 Shader System 来确定哪一层被渲染。（有可能会多定义一些Debug Layer？）
+
+```json
+"default":{
+  { "name":"depth_prepass", "ds_target":"ds_buffer", "sort":"F2B" },
+  {
+    "name":"gubffer", "sort":"F2B",
+    "rt_targets":"albedo normal",
+    "ds_target":"ds_buffer",
+    "profiling_scope":"gbuffer"
+  },
+  {
+    "name":"deferred_shading", "res_gen":"deferred_shading",
+    "rt_targets":"light_accumulation",
+    "ds_target":"ds_buffer"
+  },
+  { "name":"skydome", ...},
+  { "name":"reflection", ...},
+  { "name":"fog_apply", ...},
+  { "name":"semi_transparency", ...},
+  { "name":"reansparency", ...},
+  { "name":"tone_mapping", ... },
+  {
+    "name":"post_process", "res_gen":"post_processing",
+    "rt_target":"back_buffer",
+    "ds_target":"ds_buffer",
+    "profiling_scope":"post_processing"
+  }
+}
+```
+
+
+
+- 每一层都是一个粗粒度的阶段，类似 Unity Pipeline 里的 LightMode。
+- 会通过名字指定好渲染输出的RT；排序算法。
+
+- 可选的资源生成器：复用资源；类似后处理的只是做Graph.Blit操作。
+
+**Viewport**：最后是通过Viewport整合所有的渲染操作的。并通过 View 来确认哪个配置要被使用，有可能不同的View有不同的 configuration。
+
+还有一部分本地资源集，比如说其他配置里没有的 current adapted luminance 之类的图。
+
+最后GamePlay程序员可以直接调用来渲染世界。
+
+```c++
+render_world(pWorld, pCamera, Viewport);
+```
+
+<font color="red">值得一提的是，Tobias Persson在最新的blog里全面转向了 Frame Graph，抛弃了DOD设计，看 frame graph 翻译里的链接。</font>
+
+#### Unity所做的技术选型
 
 这里有两种技术选型，是配置驱动的（DOD），还是代码驱动的？
 
