@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: Unity SRP 概念介绍
 ---
 

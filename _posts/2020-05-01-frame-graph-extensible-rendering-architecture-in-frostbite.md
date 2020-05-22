@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: post
 title: frame-graph-extensible-rendering-architecture-in-frostbite
 ---
 # Frame Graph - 寒霜引擎可拓展的渲染结构
