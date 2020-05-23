@@ -1,6 +1,7 @@
 ---
 layout: post
 title: frame-graph-extensible-rendering-architecture-in-frostbite
+tags: frame-graph render-system engine-architecture
 ---
 # Frame Graph - 寒霜引擎可拓展的渲染结构
 

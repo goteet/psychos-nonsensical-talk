@@ -8,27 +8,30 @@
     <link rel="stylesheet" type="text/css" media="screen" href="{{ '/assets/css/style.css?v=' | append: site.github.build_revision | relative_url }}">
     {% include mathjax.html %}
     {% seo %}
+    <style type="text/css">
+      #page_title {
+        font-size:24pt;
+        font-weight: bold;
+        color:white;
+      }
+    </style>
   </head>
 
   <body>
-
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
         <header class="inner">
-          {% if site.github.is_project_page %}
-            <a id="forkme_banner" href="{{ site.github.repository_url }}">View on GitHub</a>
-          {% endif %}
-
-          <h1 id="project_title">{{ site.title | default: site.github.repository_name }}</h1>
-          <h2 id="project_tagline">{{ site.description | default: site.github.project_tagline }}</h2>
-          <span id="back_to_home"><a href="{{ site.baseurl }}">back to homepage</a></span>
-
-          {% if site.show_downloads %}
-            <section id="downloads">
-              <a class="zip_download_link" href="{{ site.github.zip_url }}">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="{{ site.github.tar_url }}">Download this project as a tar.gz file</a>
-            </section>
-          {% endif %}
+          <span id="page_title">{{ page.title }}</span>
+          <span id="tag_list">
+            <ul>
+            {% if page.tags %}
+              {% for tag in page.tags %}
+              <li class="post-tag"><a href="{{ site.baseurl }}#{{ tag | slugify }}">{{ tag }}</a></li>
+              {% endfor %}
+            {% endif %}
+            </ul>
+          </span>
+          <span id="back_to_home"><a href="{{ site.baseurl }}">back to index</a></span>
         </header>
     </div>
 

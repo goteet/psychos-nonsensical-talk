@@ -1,6 +1,7 @@
 ---
 layout: post
 title: Unity SRP 概念介绍
+tags: frame-graph render-system engine-architecture unity srp
 ---
 
 # Unity Scriptable Render Pipeline 概念介绍
